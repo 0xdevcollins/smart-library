@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,6 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BookOpen, Search, Clock, Download, User, LogOut, Bell } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth"
+import { LoadingPage } from "@/components/LoadingSpinner"
 
 // Mock data for demonstration
 const mockBooks = [
@@ -106,35 +107,23 @@ const mockPdfRequests = [
 export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
-  const [studentId, setStudentId] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const { user, isAuthenticated, isLoading, logout } = useAuth()
 
   useEffect(() => {
-    const checkAuth = () => {
-      if (typeof window === "undefined") return
-
-      const storedStudentId = localStorage.getItem("studentId")
-      const userType = localStorage.getItem("userType")
-
-      if (!storedStudentId || userType !== "student") {
-        router.push("/")
-        return
-      }
-
-      setStudentId(storedStudentId)
-      setIsLoading(false)
+    if (!isLoading && !isAuthenticated) {
+      router.push("/")
+      return
     }
 
-    checkAuth()
-  }, [router])
+    if (!isLoading && user?.role !== 'student') {
+      router.push("/")
+      return
+    }
+  }, [isLoading, isAuthenticated, user, router])
 
   const handleLogout = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("studentId")
-      localStorage.removeItem("userType")
-    }
-    router.push("/")
+    logout()
   }
 
   const filteredBooks = mockBooks.filter((book) => {
@@ -163,14 +152,11 @@ export default function Dashboard() {
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <BookOpen className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-pulse" />
-          <p className="text-gray-600">Loading your dashboard...</p>
-        </div>
-      </div>
-    )
+    return <LoadingPage text="Loading your dashboard..." />
+  }
+
+  if (!isAuthenticated || user?.role !== 'student') {
+    return <LoadingPage text="Redirecting..." />
   }
 
   return (
@@ -191,7 +177,7 @@ export default function Dashboard() {
               <Bell className="h-5 w-5 text-gray-600" />
               <div className="flex items-center gap-2">
                 <User className="h-5 w-5 text-gray-600" />
-                <span className="text-sm font-medium">{studentId}</span>
+                <span className="text-sm font-medium">{user?.studentId || user?.name}</span>
               </div>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
@@ -359,7 +345,7 @@ export default function Dashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">Student ID</Label>
-                    <p className="text-sm text-gray-600">{studentId}</p>
+                    <p className="text-sm text-gray-600">{user?.studentId}</p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Department</Label>

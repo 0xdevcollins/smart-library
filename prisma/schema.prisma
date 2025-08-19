@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  password      String
+  role          UserRole @default(STUDENT)
+  studentId     String?  @unique
+  department    String?
+  level         String?
+  accountStatus AccountStatus @default(ACTIVE)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  borrowedBooks    BorrowedBook[]
+  pdfRequests      PdfRequest[]
+  activities       Activity[]
+
+  @@map("users")
+}
+
+model Book {
+  id            Int      @id @default(autoincrement())
+  title         String
+  author        String
+  isbn          String   @unique
+  category      String
+  description   String
+  available     Int      @default(0)
+  total         Int      @default(0)
+  publishedYear Int?
+  publisher     String?
+  location      String?
+  coverImage    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  borrowedBooks BorrowedBook[]
+  pdfRequests   PdfRequest[]
+
+  @@map("books")
+}
+
+model BorrowedBook {
+  id         Int           @id @default(autoincrement())
+  bookId     Int
+  userId     String
+  borrowDate DateTime      @default(now())
+  dueDate    DateTime
+  returnDate DateTime?
+  status     BorrowStatus  @default(BORROWED)
+  fine       Float?        @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  // Relations
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("borrowed_books")
+}
+
+model PdfRequest {
+  id            Int            @id @default(autoincrement())
+  bookId        Int
+  userId        String
+  requestDate   DateTime       @default(now())
+  status        RequestStatus  @default(PENDING)
+  reason        String
+  adminNotes    String?
+  processedDate DateTime?
+  pdfUrl        String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relations
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("pdf_requests")
+}
+
+model Activity {
+  id          Int      @id @default(autoincrement())
+  action      String
+  userId      String
+  userType    UserRole
+  bookId      Int?
+  bookTitle   String?
+  details     Json?
+  timestamp   DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("activities")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+}
+
+enum BorrowStatus {
+  BORROWED
+  RETURNED
+  OVERDUE
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}

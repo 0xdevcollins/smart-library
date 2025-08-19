@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BookOpen, Users, Download, Shield } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function LoginPage() {
   const [studentId, setStudentId] = useState("")
@@ -18,29 +19,33 @@ export default function LoginPage() {
   const [adminPassword, setAdminPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { user, isAuthenticated, login } = useAuth()
 
-  // Clear any existing session on component mount
+  // Check if user is already authenticated
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("userType")
-      localStorage.removeItem("studentId")
-      localStorage.removeItem("adminEmail")
+    if (isAuthenticated) {
+      if (user?.role === 'student') {
+        router.push('/dashboard')
+      } else if (user?.role === 'admin') {
+        router.push('/admin')
+      }
     }
-  }, [])
+  }, [isAuthenticated, user, router])
 
   const handleStudentLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     if (studentId && password) {
       setIsLoading(true)
       try {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 500))
-
-        if (typeof window !== "undefined") {
-          localStorage.setItem("userType", "student")
-          localStorage.setItem("studentId", studentId)
+        const success = await login({
+          studentId,
+          password,
+          userType: 'student'
+        })
+        
+        if (!success) {
+          alert("Login failed. Please check your credentials.")
         }
-        router.push("/dashboard")
       } catch (error) {
         console.error("Login error:", error)
         alert("Login failed. Please try again.")
@@ -55,14 +60,15 @@ export default function LoginPage() {
     if (adminEmail && adminPassword) {
       setIsLoading(true)
       try {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 500))
-
-        if (typeof window !== "undefined") {
-          localStorage.setItem("userType", "admin")
-          localStorage.setItem("adminEmail", adminEmail)
+        const success = await login({
+          email: adminEmail,
+          password: adminPassword,
+          userType: 'admin'
+        })
+        
+        if (!success) {
+          alert("Login failed. Please check your credentials.")
         }
-        router.push("/admin")
       } catch (error) {
         console.error("Login error:", error)
         alert("Login failed. Please try again.")

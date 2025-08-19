@@ -18,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { BookOpen, Users, Download, Plus, LogOut, BarChart3 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth"
+import { LoadingPage } from "@/components/LoadingSpinner"
 
 // Mock data for admin dashboard
 const mockStats = {
@@ -54,7 +56,6 @@ const mockPdfRequests = [
 ]
 
 export default function AdminDashboard() {
-  const [adminEmail, setAdminEmail] = useState("")
   const [isAddBookOpen, setIsAddBookOpen] = useState(false)
   const [newBook, setNewBook] = useState({
     title: "",
@@ -65,23 +66,22 @@ export default function AdminDashboard() {
     description: "",
   })
   const router = useRouter()
+  const { user, isAuthenticated, isLoading, logout } = useAuth()
 
   useEffect(() => {
-    const storedAdminEmail = localStorage.getItem("adminEmail")
-    const userType = localStorage.getItem("userType")
-
-    if (!storedAdminEmail || userType !== "admin") {
+    if (!isLoading && !isAuthenticated) {
       router.push("/")
       return
     }
 
-    setAdminEmail(storedAdminEmail)
-  }, [router])
+    if (!isLoading && user?.role !== 'admin') {
+      router.push("/")
+      return
+    }
+  }, [isLoading, isAuthenticated, user, router])
 
   const handleLogout = () => {
-    localStorage.removeItem("adminEmail")
-    localStorage.removeItem("userType")
-    router.push("/")
+    logout()
   }
 
   const handleAddBook = () => {
@@ -107,6 +107,14 @@ export default function AdminDashboard() {
     alert(`PDF request ${requestId} rejected!`)
   }
 
+  if (isLoading) {
+    return <LoadingPage text="Loading admin dashboard..." />
+  }
+
+  if (!isAuthenticated || user?.role !== 'admin') {
+    return <LoadingPage text="Redirecting..." />
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -122,7 +130,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-sm font-medium">{adminEmail}</span>
+              <span className="text-sm font-medium">{user?.email}</span>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout

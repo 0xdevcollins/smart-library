@@ -1,36 +1,146 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ESUT Smart Library Management System
 
-## Getting Started
+A modern, responsive library management system built with Next.js 15, TypeScript, and Tailwind CSS for Enugu State University of Technology (ESUT).
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### For Students
+- **Book Catalog**: Browse and search through the library's collection
+- **Borrowing System**: Request and manage book borrowings
+- **PDF Requests**: Request digital copies of unavailable books
+- **Personal Dashboard**: Track borrowed books and due dates
+- **Profile Management**: View account information and borrowing history
+
+### For Administrators
+- **Book Management**: Add, edit, and manage library books
+- **Student Management**: View and manage student accounts
+- **PDF Request Processing**: Approve or reject student PDF requests
+- **Analytics Dashboard**: View library statistics and reports
+- **Activity Monitoring**: Track all library activities
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **UI Components**: Radix UI + Custom Components
+- **Icons**: Lucide React
+- **Authentication**: Local Storage (to be upgraded to proper auth)
+- **Database**: Mock data (ready for integration)
+
+## 📦 Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd smart-library
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   # Edit .env.local with your configuration
+   ```
+
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 🏗️ Project Structure
+
+```
+smart-library/
+├── app/                    # Next.js App Router
+│   ├── admin/             # Admin portal pages
+│   ├── dashboard/         # Student dashboard pages
+│   ├── api/               # API routes (to be implemented)
+│   ├── globals.css        # Global styles
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Landing/login page
+├── components/            # Reusable components
+│   └── ui/               # UI components (Radix-based)
+├── lib/                  # Utility functions
+├── types/                # TypeScript type definitions
+├── hooks/                # Custom React hooks
+└── utils/                # Helper functions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔐 Authentication
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Currently using localStorage for demo purposes. **Production recommendations:**
+- Implement NextAuth.js or Clerk for authentication
+- Add JWT tokens with proper expiration
+- Implement role-based access control (RBAC)
+- Add session management
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🗄️ Database Integration
 
-## Learn More
+The project is ready for database integration. **Recommended setup:**
+- **Primary Database**: PostgreSQL with Prisma ORM
+- **Caching**: Redis for session storage and caching
+- **File Storage**: AWS S3 or similar for PDF storage
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Vercel (Recommended)
+1. Connect your GitHub repository to Vercel
+2. Configure environment variables
+3. Deploy automatically on push
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Other Platforms
+- **Netlify**: Configure build settings for Next.js
+- **Railway**: Use their PostgreSQL and Redis services
+- **Self-hosted**: Docker configuration available
 
-## Deploy on Vercel
+## 📝 Development Guidelines
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Code Style
+- Use TypeScript for all new code
+- Follow ESLint and Prettier configurations
+- Use conventional commit messages
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Component Structure
+- Keep components small and focused
+- Use composition over inheritance
+- Implement proper error boundaries
+
+### State Management
+- Use React hooks for local state
+- Consider Zustand for global state
+- Implement proper loading and error states
+
+## 🔧 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For support, email support@esut.edu.ng or create an issue in the repository.
+
+---
+
+**Built with ❤️ for ESUT Library**
